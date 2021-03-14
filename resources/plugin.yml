@@ -1,0 +1,8 @@
+name: Kits
+main: dev._2lstudios.kitsplugin.kits
+version: 0.0.1
+author: 2LS
+api-version: '1.13'
+commands:
+  kit:
+    description: ""
