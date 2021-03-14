@@ -1,5 +1,5 @@
 name: Kits
-main: dev._2lstudios.kitsplugin.kits
+main: dev._2lstudios.kitsplugin.KitsPlugin
 version: 0.0.1
 author: 2LS
 api-version: '1.13'
@@ -8,9 +8,7 @@ commands:
     description: Get a kit of items.
     aliases:
       - kits
-  createkit:
+  kitsetup:
     description: ""
-  deletekit:
-    description: ""
-  previewkit:
+  kitpreview:
     description: ""
