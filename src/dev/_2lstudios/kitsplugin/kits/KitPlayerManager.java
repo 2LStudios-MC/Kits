@@ -4,7 +4,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Map.Entry;
 
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import dev._2lstudios.kitsplugin.utils.ConfigUtil;
@@ -30,7 +33,7 @@ public class KitPlayerManager {
     }
 
     public KitPlayer addPlayer(final Player player) {
-        final KitPlayer kitPlayer = new KitPlayer(configUtil, player.getName());
+        final KitPlayer kitPlayer = new KitPlayer(player.getName());
 
         players.put(player.getUniqueId(), kitPlayer);
 
@@ -43,5 +46,39 @@ public class KitPlayerManager {
         players.remove(player.getUniqueId());
 
         return kitPlayer;
+    }
+
+    public void load(final KitPlayer kitPlayer) {
+        final YamlConfiguration config = configUtil.get("%datafolder%/players/" + kitPlayer.getName() + ".yml");
+        final ConfigurationSection cooldownSection = config.getConfigurationSection("cooldowns");
+
+        if (cooldownSection != null) {
+            for (final String id : cooldownSection.getKeys(false)) {
+                final long cooldown = config.getLong("cooldowns." + id);
+
+                kitPlayer.setCooldown(id, cooldown);
+            }
+        }
+    }
+
+    public void save(final KitPlayer kitPlayer) {
+        final YamlConfiguration config = new YamlConfiguration();
+
+        for (final Entry<String, Long> entry : kitPlayer.getCooldowns().entrySet()) {
+            final String id = entry.getKey();
+            final long cooldown = entry.getValue();
+
+            if (kitPlayer.hasCooldown(id, cooldown)) {
+                config.set("cooldowns." + id, cooldown);
+            }
+        }
+
+        configUtil.save(config, "%datafolder%/players/" + kitPlayer.getName() + ".yml");
+    }
+
+    public void save() {
+        for (final KitPlayer kitPlayer : getPlayers()) {
+            save(kitPlayer);
+        }
     }
 }

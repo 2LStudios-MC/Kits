@@ -15,6 +15,6 @@ public class PlayerJoinListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerJoin(final PlayerJoinEvent event) {
-        kitPlayerManager.addPlayer(event.getPlayer()).load();
+        kitPlayerManager.load(kitPlayerManager.addPlayer(event.getPlayer()));
     }
 }

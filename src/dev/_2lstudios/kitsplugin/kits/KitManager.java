@@ -16,7 +16,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
@@ -34,7 +33,7 @@ public class KitManager {
 		this.configurationUtil = configurationUtil;
 
 		configurationUtil.create("%datafolder%/kits.yml");
-		reload();
+		load();
 	}
 
 	public void addKitInventory(final Inventory kitInventory) {
@@ -74,15 +73,15 @@ public class KitManager {
 
 		if (cooldown > 0) {
 			final int kitCooldown = kit.getCooldown();
-									final long lastTakeTime = kitPlayer.getCooldown(kit.getName());
-			final int milliseconds = (int) ((lastTakeTime + kitCooldown)
-			- System.currentTimeMillis()), seconds = (int) (milliseconds / 1000) % 60,
-			minutes = (int) ((milliseconds / (1000 * 60)) % 60),
-			hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
+			final long lastTakeTime = kitPlayer.getCooldown(kit.getName());
+			final int milliseconds = (int) ((lastTakeTime + kitCooldown) - System.currentTimeMillis()),
+					seconds = (int) (milliseconds / 1000) % 60, minutes = (int) ((milliseconds / (1000 * 60)) % 60),
+					hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
 
 			color = ChatColor.RED;
 			lore.add(ChatColor.RED + "BLOQUEADO");
-			lore.add(ChatColor.translateAlternateColorCodes('&', "&cEspera &e" + hours + "H " + minutes + "M " + seconds + "S"));
+			lore.add(ChatColor.translateAlternateColorCodes('&',
+					"&cEspera &e" + hours + "H " + minutes + "M " + seconds + "S"));
 		} else {
 			color = ChatColor.GREEN;
 			lore.add(ChatColor.GREEN + "Click para elegir!");
@@ -125,7 +124,7 @@ public class KitManager {
 			skipKits = 0;
 		}
 
-		for (final Kit kit : kits) {	
+		for (final Kit kit : kits) {
 			if (skipKits <= 0) {
 				final ItemStack itemStack = new ItemStack(kit.getIcon());
 
@@ -158,81 +157,90 @@ public class KitManager {
 		openInventory(player, kitPlayer, 0);
 	}
 
-	public void reload() {
+	public void load(final String name) {
+		final Configuration configuration = configurationUtil.get("%datafolder%/kits/" + name + ".yml");
+		final Kit kit = createKit(name);
+		final int cooldown = configuration.getInt("cooldown", 0);
+		final int price = configuration.getInt("price", 0);
+		final Object icon = configuration.get("icon");
+		final ItemStack helmet = configuration.getItemStack("helmet");
+		final ItemStack chestplate = configuration.getItemStack("chestplate");
+		final ItemStack leggings = configuration.getItemStack("leggings");
+		final ItemStack boots = configuration.getItemStack("boots");
+		final ItemStack[] contents = new ItemStack[36];
+		final ConfigurationSection itemsSection = configuration.getConfigurationSection("items");
+
+		if (itemsSection != null) {
+			for (final String slot : itemsSection.getKeys(false)) {
+				final ItemStack itemStack = configuration.getItemStack("items." + slot);
+
+				if (itemStack != null) {
+					try {
+						contents[Integer.parseInt(slot)] = itemStack;
+					} catch (final NumberFormatException e) {
+						// Ignored
+					}
+				}
+			}
+		}
+
+		kit.setHelmet(helmet);
+		kit.setChestplate(chestplate);
+		kit.setLeggings(leggings);
+		kit.setBoots(boots);
+		kit.setContents(contents);
+		kit.setPrice(price);
+		kit.setCooldown(cooldown);
+
+		if (icon instanceof Material) {
+			kit.setIcon((Material) icon);
+		}
+	}
+
+	public void load() {
 		final File kitFolder = new File(plugin.getDataFolder() + "/kits/");
 		final String[] kitFiles = kitFolder.list();
 
 		kitFolder.mkdirs();
 		kitMap.clear();
 
-		if (kitFiles != null)
+		if (kitFiles != null) {
 			for (final String kitFileName : kitFiles) {
-				final Configuration configuration = configurationUtil
-						.get("%datafolder%/kits/" + kitFileName);
-				final String name = kitFileName.replace(".yml", "");
-				final int cooldown = configuration.getInt("cooldown");
-				ItemStack helmet = null;
-				ItemStack chestplate = null;
-				ItemStack leggings = null;
-				ItemStack boots = null;
-				final ItemStack[] contents = new ItemStack[36];
-				final ConfigurationSection itemsSection = configuration.getConfigurationSection("items");
-
-				if (itemsSection != null) {
-					for (final String slot : itemsSection.getKeys(false)) {
-						final ItemStack itemStack = configuration.getItemStack("items." + slot);
-
-						if (itemStack != null) {
-							if (slot.equals("helmet"))
-								helmet = itemStack;
-							if (slot.equals("chestplate"))
-								chestplate = itemStack;
-							if (slot.equals("leggings"))
-								leggings = itemStack;
-							if (slot.equals("boots"))
-								boots = itemStack;
-							else
-								try {
-									contents[Integer.parseInt(slot)] = itemStack;
-								} catch (final NumberFormatException e) {
-									// Ignored
-								}
-						}
-					}
-
-					kitMap.put(name, new Kit(cooldown, name, helmet, chestplate, leggings, boots,
-							contents, contents[0] != null ? contents[0].getType() : Material.STONE));
-				}
+				load(kitFileName.replace(".yml", ""));
 			}
+		}
 	}
 
 	public Kit getKit(final String name) {
 		return kitMap.getOrDefault(name, null);
 	}
 
-	public void createKit(final String name, final int cooldown, final PlayerInventory playerInventory) {
-		final YamlConfiguration yamlConfiguration = configurationUtil
-				.get("%datafolder%/kits/" + name + ".yml");
-		final ItemStack helmet = playerInventory.getHelmet();
-		final ItemStack chestplate = playerInventory.getChestplate();
-		final ItemStack leggings = playerInventory.getLeggings();
-		final ItemStack boots = playerInventory.getBoots();
-		final ItemStack[] contents = playerInventory.getContents();
-
-		kitMap.put(name, new Kit(cooldown, name, helmet, chestplate, leggings, boots, contents,
-				contents[0] != null ? contents[0].getType() : Material.STONE));
-
-		yamlConfiguration.set("cooldown", cooldown);
-		yamlConfiguration.set("items.helmet", helmet);
-		yamlConfiguration.set("items.chestplate", chestplate);
-		yamlConfiguration.set("items.leggings", leggings);
-		yamlConfiguration.set("items.boots", boots);
+	public void save(final Kit kit) {
+		final String name = kit.getName();
+		final ItemStack[] contents = kit.getContents();
+		final YamlConfiguration yamlConfiguration = new YamlConfiguration();
 
 		for (int i = 0; i < contents.length; i++) {
 			yamlConfiguration.set("items." + i, contents[i]);
 		}
 
+		yamlConfiguration.set("cooldown", kit.getCooldown());
+		yamlConfiguration.set("price", kit.getPrice());
+		yamlConfiguration.set("icon", kit.getIcon());
+		yamlConfiguration.set("helmet", kit.getHelmet());
+		yamlConfiguration.set("chestplate", kit.getChestplate());
+		yamlConfiguration.set("leggings", kit.getLeggings());
+		yamlConfiguration.set("boots", kit.getBoots());
+
 		configurationUtil.saveAsync(yamlConfiguration, "%datafolder%/kits/" + name + ".yml");
+	}
+
+	public Kit createKit(final String name) {
+		final Kit kit = new Kit(name);
+
+		kitMap.put(name, kit);
+
+		return kit;
 	}
 
 	public void deleteKit(final String name) {
@@ -242,5 +250,11 @@ public class KitManager {
 
 	public Collection<Kit> getKits() {
 		return kitMap.values();
+	}
+
+	public void save() {
+		for (final Kit kit : getKits()) {
+			save(kit);
+		}
 	}
 }
