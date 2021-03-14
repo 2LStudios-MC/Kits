@@ -9,10 +9,10 @@ import org.bukkit.entity.Player;
 import dev._2lstudios.kitsplugin.kits.Kit;
 import dev._2lstudios.kitsplugin.kits.KitManager;
 
-public class KitPreviewCMD implements CommandExecutor {
+public class PreviewKitCMD implements CommandExecutor {
 	private final KitManager kitManager;
 
-	public KitPreviewCMD(final KitManager kitManager) {
+	public PreviewKitCMD(final KitManager kitManager) {
 		this.kitManager = kitManager;
 	}
 

@@ -5,4 +5,12 @@ author: 2LS
 api-version: '1.13'
 commands:
   kit:
+    description: Get a kit of items.
+    aliases:
+      - kits
+  createkit:
+    description: ""
+  deletekit:
+    description: ""
+  previewkit:
     description: ""

@@ -7,6 +7,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import dev._2lstudios.kitsplugin.commands.CreateKitCMD;
+import dev._2lstudios.kitsplugin.commands.DeleteKitCMD;
+import dev._2lstudios.kitsplugin.commands.KitCMD;
+import dev._2lstudios.kitsplugin.commands.PreviewKitCMD;
 import dev._2lstudios.kitsplugin.kits.KitManager;
 import dev._2lstudios.kitsplugin.kits.KitPlayer;
 import dev._2lstudios.kitsplugin.kits.KitPlayerManager;
@@ -35,6 +39,11 @@ public class KitsPlugin extends JavaPlugin {
         pluginManager.registerEvents(new InventoryClickListener(kitManager), this);
         pluginManager.registerEvents(new PlayerJoinListener(kitPlayerManager), this);
         pluginManager.registerEvents(new PlayerQuitListener(kitPlayerManager), this);
+
+        getCommand("kit").setExecutor(new KitCMD(kitManager, kitPlayerManager));
+        getCommand("createkit").setExecutor(new CreateKitCMD(kitManager));
+        getCommand("deletekit").setExecutor(new DeleteKitCMD(kitManager));
+        getCommand("previewkit").setExecutor(new PreviewKitCMD(kitManager));
     }
 
     @Override
