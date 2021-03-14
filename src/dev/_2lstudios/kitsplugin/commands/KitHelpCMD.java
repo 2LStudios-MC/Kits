@@ -13,14 +13,14 @@ public class KitHelpCMD {
 
         label = label + " ";
 
-        addHelpLine(builder, "", "kit <nombre>", "Obten un kit!");
-        addHelpLine(builder, "", "kitpreview <nombre>", "Previsualiza un kit!");
-        addHelpLine(builder, label, "create <nombre> [precio] [cooldown]", "Crea un nuevo kit!");
-        addHelpLine(builder, label, "delete <nombre>", "Elimina un kit!");
-        addHelpLine(builder, label, "setcontent <nombre>", "Cambia el contenido de un kit!");
-        addHelpLine(builder, label, "seticon <nombre>", "Cambia el icono de un kit!");
-        addHelpLine(builder, label, "setprice <nombre> <precio>", "Cambia el precio de un kit!");
-        addHelpLine(builder, label, "setcooldown <nombre> <cooldown>", "Cambia el cooldown de un kit!");
+        addHelpLine(builder, "", "kit <nombre>", "Obten un kit");
+        addHelpLine(builder, "", "kitpreview <nombre>", "Previsualiza un kit");
+        addHelpLine(builder, label, "create <nombre> [precio] [cooldown]", "Crea un nuevo kit");
+        addHelpLine(builder, label, "delete <nombre>", "Elimina un kit");
+        addHelpLine(builder, label, "setcontent <nombre>", "Cambia el contenido de un kit");
+        addHelpLine(builder, label, "seticon <nombre>", "Cambia el icono de un kit");
+        addHelpLine(builder, label, "setprice <nombre> <precio>", "Cambia el precio de un kit");
+        addHelpLine(builder, label, "setcooldown <nombre> <cooldown>", "Cambia el cooldown de un kit");
 
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', builder.toString()));
     }

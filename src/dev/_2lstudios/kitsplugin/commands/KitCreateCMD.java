@@ -11,16 +11,28 @@ import dev._2lstudios.kitsplugin.kits.Kit;
 import dev._2lstudios.kitsplugin.kits.KitManager;
 
 public class KitCreateCMD {
+	private int getInt(final String[] args, final int i) {
+		if (args.length > i) {
+			try {
+				return Integer.parseInt(args[i]);
+			} catch (final NumberFormatException e) {
+				// Ignore
+			}
+		}
+
+		return 0;
+	}
+
 	KitCreateCMD(final KitManager kitManager, final CommandSender sender, final String[] args) {
-		if (args.length > 2) {
+		if (args.length > 1) {
 			if (sender.hasPermission("kits.create")) {
 				if (sender instanceof Player) {
 					final String name = args[0].toUpperCase();
 
 					if (kitManager.getKit(name) == null) {
 						try {
-							final int price = Integer.parseInt(args[1]);
-							final int cooldown = Integer.parseInt(args[2]);
+							final int price = getInt(args, 1);
+							final int cooldown = getInt(args, 2);
 							final Player player = (Player) sender;
 							final PlayerInventory playerInventory = player.getInventory();
 							final ItemStack itemInHand = playerInventory.getItem(playerInventory.getHeldItemSlot());
@@ -49,6 +61,6 @@ public class KitCreateCMD {
 			} else
 				sender.sendMessage(ChatColor.RED + "Permisos insuficientes!");
 		} else
-			sender.sendMessage(ChatColor.RED + "/createkit <nombre> <cooldown>");
+			sender.sendMessage(ChatColor.RED + "/createkit <nombre> [precio] [cooldown]");
 	}
 }
