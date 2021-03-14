@@ -12,6 +12,7 @@ import dev._2lstudios.kitsplugin.kits.KitManager;
 
 public class KitSetIconCMD {
     KitSetIconCMD(final CommandSender sender, final KitManager kitManager, final String[] args, final String label) {
+        if (sender.hasPermission("kits.create")) {
         if (args.length > 1) {
             if (sender instanceof Player) {
                 final Kit kit = kitManager.getKit(args[1]);
@@ -41,5 +42,8 @@ public class KitSetIconCMD {
         } else {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c/" + label + " seticon <kit>"));
         }
+    } else {
+        sender.sendMessage(ChatColor.RED + "Permisos insuficientes!");
+    }
     }
 }

@@ -27,12 +27,12 @@ public class KitCreateCMD {
 		if (args.length > 1) {
 			if (sender.hasPermission("kits.create")) {
 				if (sender instanceof Player) {
-					final String name = args[0].toUpperCase();
+					final String name = args[1].toUpperCase();
 
 					if (kitManager.getKit(name) == null) {
 						try {
-							final int price = getInt(args, 1);
-							final int cooldown = getInt(args, 2);
+							final int price = getInt(args, 2);
+							final int cooldown = getInt(args, 3);
 							final Player player = (Player) sender;
 							final PlayerInventory playerInventory = player.getInventory();
 							final ItemStack itemInHand = playerInventory.getItem(playerInventory.getHeldItemSlot());

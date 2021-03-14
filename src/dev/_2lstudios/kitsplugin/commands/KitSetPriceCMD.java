@@ -9,6 +9,7 @@ import dev._2lstudios.kitsplugin.kits.KitManager;
 
 public class KitSetPriceCMD {
     KitSetPriceCMD(final CommandSender sender, final KitManager kitManager, final String[] args, final String label) {
+        if (sender.hasPermission("kits.create")) {
         if (args.length > 2) {
             if (sender instanceof Player) {
                 final Kit kit = kitManager.getKit(args[1]);
@@ -35,5 +36,8 @@ public class KitSetPriceCMD {
         } else {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c/" + label + " setprice <kit> <precio>"));
         }
+    } else {
+        sender.sendMessage(ChatColor.RED + "Permisos insuficientes!");
     }
+}
 }
