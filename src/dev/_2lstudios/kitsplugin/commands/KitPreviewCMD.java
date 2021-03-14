@@ -27,7 +27,7 @@ public class KitPreviewCMD implements CommandExecutor {
 
 				if (kit != null) {
 					final Player player = (Player) sender;
-					
+
 					kitManager.openPreviewInventory(player, kit);
 				} else
 					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cEse kit no existe!"));

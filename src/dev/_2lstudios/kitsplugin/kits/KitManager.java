@@ -232,7 +232,7 @@ public class KitManager {
 		yamlConfiguration.set("leggings", kit.getLeggings());
 		yamlConfiguration.set("boots", kit.getBoots());
 
-		configurationUtil.saveAsync(yamlConfiguration, "%datafolder%/kits/" + name + ".yml");
+		configurationUtil.save(yamlConfiguration, "%datafolder%/kits/" + name + ".yml");
 	}
 
 	public Kit createKit(final String name) {

@@ -10,7 +10,6 @@ import dev._2lstudios.kitsplugin.kits.KitManager;
 
 public class KitSetContentCMD {
     KitSetContentCMD(final CommandSender sender, final KitManager kitManager, final String[] args, final String label) {
-        if (sender.hasPermission("kits.create")) {
         if (args.length > 1) {
             if (sender instanceof Player) {
                 final Kit kit = kitManager.getKit(args[1]);
@@ -32,8 +31,5 @@ public class KitSetContentCMD {
         } else {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c/" + label + " setcontent <kit>"));
         }
-    } else {
-        sender.sendMessage(ChatColor.RED + "Permisos insuficientes!");
-    }
     }
 }

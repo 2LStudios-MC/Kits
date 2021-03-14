@@ -4,7 +4,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 public class KitHelpCMD {
-    private void addHelpLine(final StringBuilder builder, final String label, final String command, final String description) {
+    private void addHelpLine(final StringBuilder builder, final String label, final String command,
+            final String description) {
         builder.append("\n&e/" + label + command + "&7 - &b" + description + "!");
     }
 

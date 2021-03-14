@@ -15,6 +15,6 @@ public class PlayerQuitListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerQuit(final PlayerQuitEvent event) {
-        kitPlayerManager.save(kitPlayerManager.removePlayer(event.getPlayer()));
+        kitPlayerManager.saveAsync(kitPlayerManager.removePlayer(event.getPlayer()));
     }
 }

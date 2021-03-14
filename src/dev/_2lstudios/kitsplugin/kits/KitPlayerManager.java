@@ -9,14 +9,17 @@ import java.util.Map.Entry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import dev._2lstudios.kitsplugin.utils.ConfigUtil;
 
 public class KitPlayerManager {
+    private final Plugin plugin;
     private final ConfigUtil configUtil;
     private final Map<UUID, KitPlayer> players = new HashMap<>();
 
-    public KitPlayerManager(final ConfigUtil configUtil) {
+    public KitPlayerManager(final Plugin plugin, final ConfigUtil configUtil) {
+        this.plugin = plugin;
         this.configUtil = configUtil;
     }
 
@@ -74,6 +77,10 @@ public class KitPlayerManager {
         }
 
         configUtil.save(config, "%datafolder%/players/" + kitPlayer.getName() + ".yml");
+    }
+
+    public void saveAsync(final KitPlayer kitPlayer) {
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> save(kitPlayer));
     }
 
     public void save() {

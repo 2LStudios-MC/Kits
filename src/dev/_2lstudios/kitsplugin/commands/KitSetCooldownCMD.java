@@ -8,8 +8,8 @@ import dev._2lstudios.kitsplugin.kits.Kit;
 import dev._2lstudios.kitsplugin.kits.KitManager;
 
 public class KitSetCooldownCMD {
-    KitSetCooldownCMD(final CommandSender sender, final KitManager kitManager, final String[] args, final String label) {
-        if (sender.hasPermission("kits.create")) {
+    KitSetCooldownCMD(final CommandSender sender, final KitManager kitManager, final String[] args,
+            final String label) {
         if (args.length > 2) {
             if (sender instanceof Player) {
                 final Kit kit = kitManager.getKit(args[1]);
@@ -20,8 +20,9 @@ public class KitSetCooldownCMD {
 
                         kit.setCooldown(cooldown);
 
-                        sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                                "&aEstableciste el cooldown del kit &b" + kit.getName() + "&a a &6" + cooldown + "s&a!"));
+                        sender.sendMessage(
+                                ChatColor.translateAlternateColorCodes('&', "&aEstableciste el cooldown del kit &b"
+                                        + kit.getName() + "&a a &6" + cooldown + "s&a!"));
                     } catch (final NumberFormatException e) {
                         sender.sendMessage(
                                 ChatColor.translateAlternateColorCodes('&', "&cIngresaste un numero invalido!"));
@@ -36,8 +37,5 @@ public class KitSetCooldownCMD {
         } else {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c/" + label + " setprice <kit> <precio>"));
         }
-    } else {
-        sender.sendMessage(ChatColor.RED + "Permisos insuficientes!");
-    }
     }
 }

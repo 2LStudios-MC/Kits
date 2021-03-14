@@ -28,7 +28,7 @@ public class KitsPlugin extends JavaPlugin {
         final ConfigUtil configUtil = new ConfigUtil(this);
 
         kitManager = new KitManager(this, configUtil);
-        kitPlayerManager = new KitPlayerManager(configUtil);
+        kitPlayerManager = new KitPlayerManager(this, configUtil);
 
         for (final Player player : server.getOnlinePlayers()) {
             kitPlayerManager.addPlayer(player);
