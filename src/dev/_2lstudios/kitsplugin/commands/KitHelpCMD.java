@@ -16,6 +16,7 @@ public class KitHelpCMD {
 
         addHelpLine(builder, "", "kit <nombre>", "Obten un kit");
         addHelpLine(builder, "", "kitpreview <nombre>", "Previsualiza un kit");
+        addHelpLine(builder, label, "rename <nombre viejo> <nombre nuevo>", "Renombra un kit");
         addHelpLine(builder, label, "create <nombre> [precio] [cooldown]", "Crea un nuevo kit");
         addHelpLine(builder, label, "delete <nombre>", "Elimina un kit");
         addHelpLine(builder, label, "setcontent <nombre>", "Cambia el contenido de un kit");

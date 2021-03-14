@@ -20,6 +20,8 @@ public class KitSetupCMD implements CommandExecutor {
         if (sender.hasPermission("kits.setup")) {
             if (args.length < 1) {
                 new KitHelpCMD(sender, label);
+            } else if (args[0].equals("rename")) {
+                new KitRenameCMD(kitManager, sender, label, args);
             } else if (args[0].equals("create")) {
                 new KitCreateCMD(kitManager, sender, label, args);
             } else if (args[0].equals("delete")) {

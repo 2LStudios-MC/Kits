@@ -246,6 +246,29 @@ public class KitManager {
 		kitMap.remove(name);
 	}
 
+	public boolean rename(final String oldName, final String newName) {
+		final Kit oldKit = getKit(oldName);
+
+		if (oldKit != null) {
+			deleteKit(oldName);
+			
+			final Kit newKit = createKit(newName);
+
+			newKit.setBoots(oldKit.getBoots());
+			newKit.setLeggings(oldKit.getLeggings());
+			newKit.setChestplate(oldKit.getChestplate());
+			newKit.setHelmet(oldKit.getHelmet());
+			newKit.setContents(oldKit.getContents());
+			newKit.setCooldown(oldKit.getCooldown());
+			newKit.setPrice(oldKit.getPrice());
+			newKit.setIcon(oldKit.getIcon());
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public Collection<Kit> getKits() {
 		return kitMap.values();
 	}
