@@ -12,7 +12,7 @@ public class KitSetCooldownCMD {
             final String label) {
         if (args.length > 2) {
             if (sender instanceof Player) {
-                final Kit kit = kitManager.getKit(args[1]);
+                final Kit kit = kitManager.getKit(args[1].toUpperCase());
 
                 if (kit != null) {
                     try {

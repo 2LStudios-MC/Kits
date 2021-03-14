@@ -14,7 +14,7 @@ public class KitSetIconCMD {
     KitSetIconCMD(final CommandSender sender, final KitManager kitManager, final String[] args, final String label) {
         if (args.length > 1) {
             if (sender instanceof Player) {
-                final Kit kit = kitManager.getKit(args[1]);
+                final Kit kit = kitManager.getKit(args[1].toUpperCase());
 
                 if (kit != null) {
                     final PlayerInventory inventory = ((Player) sender).getInventory();
