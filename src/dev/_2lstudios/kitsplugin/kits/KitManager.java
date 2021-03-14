@@ -162,7 +162,7 @@ public class KitManager {
 		final Kit kit = createKit(name);
 		final int cooldown = configuration.getInt("cooldown", 0);
 		final int price = configuration.getInt("price", 0);
-		final Object icon = configuration.get("icon");
+		final String icon = configuration.getString("icon", "IRON_HELMET");
 		final ItemStack helmet = configuration.getItemStack("helmet");
 		final ItemStack chestplate = configuration.getItemStack("chestplate");
 		final ItemStack leggings = configuration.getItemStack("leggings");
@@ -192,9 +192,7 @@ public class KitManager {
 		kit.setPrice(price);
 		kit.setCooldown(cooldown);
 
-		if (icon instanceof Material) {
-			kit.setIcon((Material) icon);
-		}
+		kit.setIcon(Material.valueOf(icon));
 	}
 
 	public void load() {
@@ -226,7 +224,7 @@ public class KitManager {
 
 		yamlConfiguration.set("cooldown", kit.getCooldown());
 		yamlConfiguration.set("price", kit.getPrice());
-		yamlConfiguration.set("icon", kit.getIcon());
+		yamlConfiguration.set("icon", kit.getIcon().toString());
 		yamlConfiguration.set("helmet", kit.getHelmet());
 		yamlConfiguration.set("chestplate", kit.getChestplate());
 		yamlConfiguration.set("leggings", kit.getLeggings());

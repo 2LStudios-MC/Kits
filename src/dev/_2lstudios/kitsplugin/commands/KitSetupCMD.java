@@ -21,9 +21,9 @@ public class KitSetupCMD implements CommandExecutor {
             if (args.length < 1) {
                 new KitHelpCMD(sender, label);
             } else if (args[0].equals("create")) {
-                new KitCreateCMD(kitManager, sender, args);
+                new KitCreateCMD(kitManager, sender, label, args);
             } else if (args[0].equals("delete")) {
-                new KitDeleteCMD(kitManager, sender, args);
+                new KitDeleteCMD(kitManager, sender, label, args);
             } else if (args[0].equals("seticon")) {
                 new KitSetIconCMD(sender, kitManager, args, label);
             } else if (args[0].equals("setcontent")) {

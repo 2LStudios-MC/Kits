@@ -23,7 +23,7 @@ public class KitCreateCMD {
 		return 0;
 	}
 
-	KitCreateCMD(final KitManager kitManager, final CommandSender sender, final String[] args) {
+	KitCreateCMD(final KitManager kitManager, final CommandSender sender, final String label, final String[] args) {
 		if (args.length > 1) {
 			if (sender instanceof Player) {
 				final String name = args[1].toUpperCase();
@@ -47,7 +47,8 @@ public class KitCreateCMD {
 							kit.setIcon(Material.IRON_HELMET);
 						}
 
-						sender.sendMessage(ChatColor.GREEN + "Creaste el kit correctamente!");
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
+								"&aCreaste el kit &b" + name + "&a correctamente!"));
 					} catch (NumberFormatException ignored) {
 						sender.sendMessage(ChatColor.RED + "Ingresaste un numero invalido!");
 					}
@@ -58,6 +59,6 @@ public class KitCreateCMD {
 			} else
 				sender.sendMessage(ChatColor.RED + "No puedes ejecutar este comando desde la consola!");
 		} else
-			sender.sendMessage(ChatColor.RED + "/createkit <nombre> [precio] [cooldown]");
+			sender.sendMessage(ChatColor.RED + "/" + label + " create <nombre> [precio] [cooldown]");
 	}
 }
