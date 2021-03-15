@@ -11,17 +11,35 @@ import dev._2lstudios.kitsplugin.commands.KitSetupCMD;
 import dev._2lstudios.kitsplugin.kits.KitManager;
 import dev._2lstudios.kitsplugin.kits.KitPlayerManager;
 import dev._2lstudios.kitsplugin.listeners.InventoryAPIClickListener;
-import dev._2lstudios.kitsplugin.listeners.InventoryAPICloseListener;
 import dev._2lstudios.kitsplugin.listeners.PlayerJoinListener;
 import dev._2lstudios.kitsplugin.listeners.PlayerQuitListener;
 import dev._2lstudios.kitsplugin.utils.ConfigUtil;
 
 public class KitsPlugin extends JavaPlugin {
+    private static KitsPlugin instance;
     private KitManager kitManager = null;
     private KitPlayerManager kitPlayerManager = null;
 
+    public static void setInstance(final KitsPlugin instance) {
+        KitsPlugin.instance = instance;
+    }
+
+    public static KitsPlugin getInstance() {
+        return instance;
+    }
+
+    public KitManager getKitManager() {
+        return kitManager;
+    }
+
+    public KitPlayerManager getKitPlayerManager() {
+        return kitPlayerManager;
+    }
+
     @Override
     public void onEnable() {
+        setInstance(this);
+
         final Server server = getServer();
         final PluginManager pluginManager = server.getPluginManager();
         final ConfigUtil configUtil = new ConfigUtil(this);
@@ -34,7 +52,6 @@ public class KitsPlugin extends JavaPlugin {
         }
 
         pluginManager.registerEvents(new InventoryAPIClickListener(kitPlayerManager, kitManager), this);
-        pluginManager.registerEvents(new InventoryAPICloseListener(), this);
         pluginManager.registerEvents(new PlayerJoinListener(kitPlayerManager), this);
         pluginManager.registerEvents(new PlayerQuitListener(kitPlayerManager), this);
 
@@ -46,6 +63,6 @@ public class KitsPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         kitPlayerManager.save();
-        kitManager.save(); 
+        kitManager.save();
     }
 }

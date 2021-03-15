@@ -10,10 +10,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import dev._2lstudios.inventoryapi.InventoryAPI;
-import dev._2lstudios.inventoryapi.InventoryPlayer;
-import dev._2lstudios.inventoryapi.InventoryUtil;
-import dev._2lstudios.inventoryapi.InventoryWrapper;
 import dev._2lstudios.inventoryapi.events.InventoryAPIClickEvent;
+import dev._2lstudios.inventoryapi.inventory.InventoryUtil;
+import dev._2lstudios.inventoryapi.inventory.InventoryWrapper;
 import dev._2lstudios.kitsplugin.kits.Kit;
 import dev._2lstudios.kitsplugin.kits.KitManager;
 import dev._2lstudios.kitsplugin.kits.KitPlayer;
@@ -32,25 +31,27 @@ public class InventoryAPIClickListener implements Listener {
 
     // This checks for buttons
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void onInventoryAPIClickNormal(final InventoryAPIClickEvent event) {
+    public void onInventoryAPIClickLowest(final InventoryAPIClickEvent event) {
         final InventoryClickEvent event1 = event.getEvent();
         final ItemStack item = event1.getCurrentItem();
 
         if (item != null) {
             final InventoryWrapper inventoryWrapper = event.getInventoryWrapper();
             final int page = inventoryWrapper.getPage();
-            final InventoryPlayer inventoryPlayer = event.getPlayer();
-            final Player player = inventoryPlayer.getPlayer();
+            final Player player = event.getPlayer();
             final KitPlayer kitPlayer = kitPlayerManager.getPlayer(player);
-
-            player.closeInventory();
 
             if (item.isSimilar(inventoryUtil.getNextItem(page))) {
                 kitManager.openInventory(player, kitPlayer, page + 1);
+                event.setCancelled(true);
+                player.closeInventory();
             } else if (item.isSimilar(inventoryUtil.getBackItem(page))) {
                 kitManager.openInventory(player, kitPlayer, page - 1);
+                event.setCancelled(true);
+                player.closeInventory();
             } else if (item.isSimilar(inventoryUtil.getCloseItem())) {
-                // Unused
+                event.setCancelled(true);
+                player.closeInventory();
             }
         }
     }
@@ -66,8 +67,7 @@ public class InventoryAPIClickListener implements Listener {
 
             if (itemMeta != null && itemMeta.hasDisplayName()) {
                 final String name = ChatColor.stripColor(itemMeta.getDisplayName());
-                final InventoryPlayer inventoryPlayer = event.getPlayer();
-                final Player player = inventoryPlayer.getPlayer();
+                final Player player = event.getPlayer();
                 final Kit kit = kitManager.getKit(name);
 
                 if (kit != null) {

@@ -19,9 +19,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
 import dev._2lstudios.inventoryapi.InventoryAPI;
-import dev._2lstudios.inventoryapi.InventoryPlayer;
-import dev._2lstudios.inventoryapi.InventoryUtil;
-import dev._2lstudios.inventoryapi.InventoryWrapper;
+import dev._2lstudios.inventoryapi.inventory.InventoryUtil;
+import dev._2lstudios.inventoryapi.inventory.InventoryWrapper;
 import dev._2lstudios.kitsplugin.utils.ConfigUtil;
 
 public class KitManager {
@@ -38,12 +37,13 @@ public class KitManager {
 	}
 
 	public void openPreviewInventory(final Player player, final Kit kit) {
-		final Inventory inventory = plugin.getServer().createInventory(player, 54, "Preview de " + kit.getName());
-		final InventoryWrapper inventoryWrapper = new InventoryWrapper(1, "kitpreview", inventory);
-		final InventoryPlayer inventoryPlayer = InventoryAPI.getInstance().getInventoryPlayerManager().get(player);
+		final String title = "Preview de " + kit.getName();
+		final InventoryAPI inventoryAPI = InventoryAPI.getInstance();
+		final InventoryUtil inventoryUtil = inventoryAPI.getInventoryUtil();
+		final InventoryWrapper inventoryWrapper = inventoryUtil.createInventory(title, player, 1, "kitpreview");
+		final Inventory inventory = inventoryWrapper.getInventory();
 
 		inventory.setContents(kit.getContents());
-		inventoryPlayer.openInventory(inventoryWrapper);
 	}
 
 	private void generateDescription(final KitPlayer kitPlayer, final Player player, final Kit kit,
@@ -95,39 +95,20 @@ public class KitManager {
 		kits.sort((o1, o2) -> Integer.compare(o1.getPrice(), o2.getPrice()));
 
 		final Collection<ItemStack> items = new ArrayList<>();
-		final int lastPage = 1 + ((kits.size() - 1) / 28);
-		int skip = Math.min((page - 1) * 28, kits.size() - 1);
 
 		for (final Kit kit : kits) {
-			if (skip-- > 0) {
-				continue;
-			}
-
 			final ItemStack itemStack = new ItemStack(kit.getIcon());
 
-			generateDescription(kitPlayer, player, kit, kit.getName(), itemStack);
+			generateDescription(kitPlayer, player, kit, kit.getName(), kit.getIcon());
 
 			items.add(itemStack);
 		}
 
 		final String title = "Kits";
 		final InventoryAPI inventoryAPI = InventoryAPI.getInstance();
-		final InventoryPlayer inventoryPlayer = inventoryAPI.getInventoryPlayerManager().get(player);
 		final InventoryUtil inventoryUtil = inventoryAPI.getInventoryUtil();
-		final InventoryWrapper inventoryWrapper = inventoryUtil.createDisplayInventory(title, player, page, title,
-				items);
 
-		if (page != 1) {
-			inventoryWrapper.setItem(45, inventoryUtil.getBackItem(page - 1));
-		}
-
-		inventoryWrapper.setItem(49, inventoryUtil.getCloseItem());
-
-		if (page != lastPage) {
-			inventoryWrapper.setItem(53, inventoryUtil.getNextItem(page + 1));
-		}
-
-		inventoryPlayer.openInventory(inventoryWrapper);
+		inventoryUtil.createDisplayInventory(title, player, page, "kits", items);
 	}
 
 	public void openInventory(final Player player, final KitPlayer kitPlayer) {
