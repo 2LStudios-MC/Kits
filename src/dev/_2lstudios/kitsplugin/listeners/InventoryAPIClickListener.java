@@ -26,8 +26,9 @@ public class InventoryAPIClickListener implements Listener {
         this.kitManager = kitManager;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void onInventoryAPIClick(final InventoryAPIClickEvent event) {
+    // This checks for buttons
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void onInventoryAPIClickNormal(final InventoryAPIClickEvent event) {
         final InventoryClickEvent event1 = event.getEvent();
         final ItemStack item = event1.getCurrentItem();
 
@@ -49,12 +50,28 @@ public class InventoryAPIClickListener implements Listener {
                     kitManager.openInventory(player, kitPlayer, inventoryWrapper.getPage() - 1);
                 } else if (name.equals("Volver")) {
                     // Unused
-                } else {
-                    final Kit kit = kitManager.getKit(name);
+                }
+            }
+        }
+    }
 
-                    if (kit != null) {
-                        kit.give(player);
-                    }
+    // This checks for kits
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onInventoryAPIClickHighest(final InventoryAPIClickEvent event) {
+        final InventoryClickEvent event1 = event.getEvent();
+        final ItemStack item = event1.getCurrentItem();
+
+        if (item != null) {
+            final ItemMeta itemMeta = item.getItemMeta();
+
+            if (itemMeta != null && itemMeta.hasDisplayName()) {
+                final String name = ChatColor.stripColor(itemMeta.getDisplayName());
+                final InventoryPlayer inventoryPlayer = event.getPlayer();
+                final Player player = inventoryPlayer.getPlayer();
+                final Kit kit = kitManager.getKit(name);
+
+                if (kit != null) {
+                    kit.give(player);
                 }
             }
         }
