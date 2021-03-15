@@ -6,9 +6,18 @@ import java.util.Map;
 public class KitPlayer {
     private final String name;
     private final Map<String, Long> cooldowns = new HashMap<>();
+    private int currentPage = 0;
 
     public KitPlayer(final String name) {
         this.name = name;
+    }
+
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
+    public void setCurrentPage(final int currentPage) {
+        this.currentPage = currentPage;
     }
 
     public String getName() {

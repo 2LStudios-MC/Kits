@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -19,13 +18,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
+import dev._2lstudios.inventoryapi.InventoryAPI;
+import dev._2lstudios.inventoryapi.InventoryPlayer;
+import dev._2lstudios.inventoryapi.InventoryUtil;
+import dev._2lstudios.inventoryapi.InventoryWrapper;
 import dev._2lstudios.kitsplugin.utils.ConfigUtil;
 
 public class KitManager {
 	private final Plugin plugin;
 	private final ConfigUtil configurationUtil;
-	// This is used to prevent players from taking items from this inventories
-	private final Collection<Inventory> kitInvenories = new HashSet<>();
 	private final Map<String, Kit> kitMap = new HashMap<>();
 
 	public KitManager(final Plugin plugin, final ConfigUtil configurationUtil) {
@@ -36,34 +37,17 @@ public class KitManager {
 		load();
 	}
 
-	public void addKitInventory(final Inventory kitInventory) {
-		this.kitInvenories.add(kitInventory);
-	}
-
-	public void removeKitInventory(final Inventory kitInventory) {
-		kitInventory.clear();
-
-		this.kitInvenories.remove(kitInventory);
-	}
-
-	public boolean isKitInventory(final Inventory kitInventory) {
-		return this.kitInvenories.contains(kitInventory);
-	}
-
-	public Collection<Inventory> getKitInventories() {
-		return this.kitInvenories;
-	}
-
 	public void openPreviewInventory(final Player player, final Kit kit) {
-		final Inventory previewInventory = plugin.getServer().createInventory(player, 54,
-				"Preview de " + kit.getName());
+		final Inventory inventory = plugin.getServer().createInventory(player, 54, "Preview de " + kit.getName());
+		final InventoryWrapper inventoryWrapper = new InventoryWrapper(1, "kitpreview", inventory);
+		final InventoryPlayer inventoryPlayer = InventoryAPI.getInstance().getInventoryPlayerManager().get(player);
 
-		addKitInventory(previewInventory);
-		previewInventory.setContents(kit.getContents());
+		inventory.setContents(kit.getContents());
+		inventoryPlayer.openInventory(inventoryWrapper);
 	}
 
-	private void generateDescription(final KitPlayer kitPlayer, final Kit kit, final String kitName,
-			final ItemStack itemStack) {
+	private void generateDescription(final KitPlayer kitPlayer, final Player player, final Kit kit,
+			final String kitName, final ItemStack itemStack) {
 		final ItemMeta itemMeta = itemStack.getItemMeta();
 		final List<String> lore = new ArrayList<>();
 		final long cooldown = kitPlayer.getCooldown(kitName);
@@ -71,7 +55,16 @@ public class KitManager {
 
 		lore.add("");
 
-		if (cooldown > 0) {
+		if (kit.getPrice() > 0) {
+			lore.add(ChatColor.GRAY + "Precio: " + ChatColor.GOLD + kit.getPrice());
+		}
+
+		if (!player.hasPermission("kit.kits." + kit.getName().toLowerCase())) {
+			color = ChatColor.RED;
+			lore.add(ChatColor.GRAY + "Estado: " + ChatColor.RED + "BLOQUEADO");
+			lore.add("");
+			lore.add(ChatColor.translateAlternateColorCodes('&', "&cSin permisos!"));
+		} else if (cooldown > 0) {
 			final int kitCooldown = kit.getCooldown();
 			final long lastTakeTime = kitPlayer.getCooldown(kit.getName());
 			final int milliseconds = (int) ((lastTakeTime + kitCooldown) - System.currentTimeMillis()),
@@ -79,12 +72,15 @@ public class KitManager {
 					hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
 
 			color = ChatColor.RED;
-			lore.add(ChatColor.RED + "BLOQUEADO");
+			lore.add(ChatColor.GRAY + "Estado: " + ChatColor.RED + "BLOQUEADO");
+			lore.add("");
 			lore.add(ChatColor.translateAlternateColorCodes('&',
 					"&cEspera &e" + hours + "H " + minutes + "M " + seconds + "S"));
 		} else {
 			color = ChatColor.GREEN;
-			lore.add(ChatColor.GREEN + "Click para elegir!");
+			lore.add(ChatColor.GRAY + "Estado: " + ChatColor.GREEN + "DESBLOQUEADO");
+			lore.add("");
+			lore.add(ChatColor.YELLOW + "Click para elegir!");
 		}
 
 		itemMeta.setLore(lore);
@@ -93,76 +89,61 @@ public class KitManager {
 	}
 
 	public void openInventory(final Player player, final KitPlayer kitPlayer, int page) {
-		// Each inventory can hold up to 28 kits
-		// Kits start populating from slot 10
-		// Every 7 kits 2 slots are skipped empty
-		final Collection<Kit> kits = getKits();
-		final Inventory inventory = plugin.getServer().createInventory(player, 54, "Kits");
+		final List<Kit> kits = new ArrayList<>(getKits());
+
+		page = Math.max(1, page);
+		kits.sort((o1, o2) -> Integer.compare(o1.getPrice(), o2.getPrice()));
+
+		final Collection<ItemStack> items = new ArrayList<>();
 		final int lastPage = 1 + ((kits.size() - 1) / 28);
-
-		if (page < 1) {
-			page = 1;
-		} else if (page > lastPage) {
-			page = lastPage;
-		}
-
-		if (page != 1) {
-			inventory.setItem(45, new ItemStack(Material.ARROW));
-		}
-
-		inventory.setItem(49, new ItemStack(Material.ARROW));
-
-		if (page != lastPage) {
-			inventory.setItem(53, new ItemStack(Material.ARROW));
-		}
-
-		int skipKits = 28 * (page - 1);
-		int slot = 10;
-		int kitCount = 0;
-
-		if (skipKits >= kits.size()) {
-			skipKits = 0;
-		}
+		int skip = Math.min((page - 1) * 28, kits.size() - 1);
 
 		for (final Kit kit : kits) {
-			if (skipKits <= 0) {
-				final ItemStack itemStack = new ItemStack(kit.getIcon());
-
-				generateDescription(kitPlayer, kit, kit.getName(), itemStack);
-
-				inventory.setItem(slot, itemStack);
-
-				kitCount++;
-
-				if (kitCount % 7 == 0) {
-					slot += 3;
-				} else {
-					slot++;
-				}
-
-				if (slot > 43) {
-					break;
-				}
-			} else {
-				skipKits--;
+			if (skip-- > 0) {
+				continue;
 			}
+
+			final ItemStack itemStack = new ItemStack(kit.getIcon());
+
+			generateDescription(kitPlayer, player, kit, kit.getName(), itemStack);
+
+			items.add(itemStack);
 		}
 
-		addKitInventory(inventory);
+		final String title = "Kits";
+		final InventoryAPI inventoryAPI = InventoryAPI.getInstance();
+		final InventoryPlayer inventoryPlayer = inventoryAPI.getInventoryPlayerManager().get(player);
+		final InventoryUtil inventoryUtil = inventoryAPI.getInventoryUtil();
+		final InventoryWrapper inventoryWrapper = inventoryUtil.createDisplayInventory(title, player, page, title,
+				items);
 
-		player.openInventory(inventory);
+		if (page != 1) {
+			inventoryWrapper.setItem(45, inventoryUtil.getBackItem(page - 1));
+		}
+
+		inventoryWrapper.setItem(49, inventoryUtil.getCloseItem());
+
+		if (page != lastPage) {
+			inventoryWrapper.setItem(53, inventoryUtil.getNextItem(page + 1));
+		}
+
+		inventoryPlayer.openInventory(inventoryWrapper);
 	}
 
 	public void openInventory(final Player player, final KitPlayer kitPlayer) {
-		openInventory(player, kitPlayer, 0);
+		openInventory(player, kitPlayer, 1);
+	}
+
+	private String getDataFolder(final String name) {
+		return "%datafolder%/kits/" + name + ".yml";
 	}
 
 	public void load(final String name) {
-		final Configuration configuration = configurationUtil.get("%datafolder%/kits/" + name + ".yml");
+		final Configuration configuration = configurationUtil.get(getDataFolder(name));
 		final Kit kit = createKit(name);
 		final int cooldown = configuration.getInt("cooldown", 0);
 		final int price = configuration.getInt("price", 0);
-		final String icon = configuration.getString("icon", "IRON_HELMET");
+		final ItemStack icon = configuration.getItemStack("icon", new ItemStack(Material.STONE));
 		final ItemStack helmet = configuration.getItemStack("helmet");
 		final ItemStack chestplate = configuration.getItemStack("chestplate");
 		final ItemStack leggings = configuration.getItemStack("leggings");
@@ -192,7 +173,7 @@ public class KitManager {
 		kit.setPrice(price);
 		kit.setCooldown(cooldown);
 
-		kit.setIcon(Material.valueOf(icon));
+		kit.setIcon(icon);
 	}
 
 	public void load() {
@@ -224,13 +205,13 @@ public class KitManager {
 
 		yamlConfiguration.set("cooldown", kit.getCooldown());
 		yamlConfiguration.set("price", kit.getPrice());
-		yamlConfiguration.set("icon", kit.getIcon().toString());
+		yamlConfiguration.set("icon", kit.getIcon());
 		yamlConfiguration.set("helmet", kit.getHelmet());
 		yamlConfiguration.set("chestplate", kit.getChestplate());
 		yamlConfiguration.set("leggings", kit.getLeggings());
 		yamlConfiguration.set("boots", kit.getBoots());
 
-		configurationUtil.save(yamlConfiguration, "%datafolder%/kits/" + name + ".yml");
+		configurationUtil.save(yamlConfiguration, getDataFolder(name));
 	}
 
 	public Kit createKit(final String name) {
@@ -242,7 +223,7 @@ public class KitManager {
 	}
 
 	public void deleteKit(final String name) {
-		configurationUtil.deleteAsync("%datafolder%/kits/" + name + ".yml");
+		configurationUtil.deleteAsync(getDataFolder(name));
 		kitMap.remove(name);
 	}
 
@@ -251,7 +232,7 @@ public class KitManager {
 
 		if (oldKit != null) {
 			deleteKit(oldName);
-			
+
 			final Kit newKit = createKit(newName);
 
 			newKit.setBoots(oldKit.getBoots());
@@ -271,6 +252,10 @@ public class KitManager {
 
 	public Collection<Kit> getKits() {
 		return kitMap.values();
+	}
+
+	public Collection<String> getKitNames() {
+		return kitMap.keySet();
 	}
 
 	public void save() {

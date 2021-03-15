@@ -42,9 +42,9 @@ public class KitCreateCMD {
 						kit.setCooldown(cooldown);
 
 						if (itemInHand != null) {
-							kit.setIcon(itemInHand.getType());
+							kit.setIcon(itemInHand);
 						} else {
-							kit.setIcon(Material.IRON_HELMET);
+							kit.setIcon(new ItemStack(Material.STONE));
 						}
 
 						sender.sendMessage(ChatColor.translateAlternateColorCodes('&',

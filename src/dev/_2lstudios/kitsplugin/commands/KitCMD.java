@@ -62,7 +62,7 @@ public class KitCMD implements CommandExecutor {
 								}
 							} else
 								sender.sendMessage(
-										ChatColor.translateAlternateColorCodes('&', "&cPermisos insuficientes!"));
+										ChatColor.translateAlternateColorCodes('&', "&cNo tienes permiso para usar ese kit!"));
 						} else {
 							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cEse kit no existe!"));
 						}

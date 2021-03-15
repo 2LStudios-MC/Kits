@@ -1,7 +1,6 @@
 package dev._2lstudios.kitsplugin.commands;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -21,12 +20,10 @@ public class KitSetIconCMD {
                     final ItemStack itemInHand = inventory.getItem(inventory.getHeldItemSlot());
 
                     if (itemInHand != null) {
-                        final Material type = itemInHand.getType();
-
-                        kit.setIcon(type);
+                        kit.setIcon(itemInHand);
 
                         sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                                "&aEstableciste el icono a &b" + type + "&a!"));
+                                "&aEstableciste el icono del kit &b" + kit.getName() + "&a correctamente!"));
                     } else {
                         sender.sendMessage(
                                 ChatColor.translateAlternateColorCodes('&', "&cNo tienes ningun item en la mano!"));

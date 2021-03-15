@@ -1,9 +1,11 @@
 package dev._2lstudios.kitsplugin.kits;
 
-import org.bukkit.Material;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+
+import dev._2lstudios.kitsplugin.events.KitGiveEvent;
 
 public class Kit {
 	private final String name;
@@ -12,7 +14,7 @@ public class Kit {
 	private ItemStack leggings;
 	private ItemStack boots;
 	private ItemStack[] contents;
-	private Material icon;
+	private ItemStack icon;
 	private int cooldown;
 	private int price;
 
@@ -21,6 +23,14 @@ public class Kit {
 	}
 
 	public void give(final Player player) {
+		final KitGiveEvent event = new KitGiveEvent(player, this);
+
+		Bukkit.getPluginManager().callEvent(event);
+
+		if (event.isCancelled()) {
+			return;
+		}
+
 		final PlayerInventory playerInventory = player.getInventory();
 
 		if (helmet != null) {
@@ -82,11 +92,11 @@ public class Kit {
 		this.boots = playerInventory.getBoots();
 	}
 
-	public Material getIcon() {
+	public ItemStack getIcon() {
 		return icon;
 	}
 
-	public void setIcon(final Material icon) {
+	public void setIcon(final ItemStack icon) {
 		this.icon = icon;
 	}
 
