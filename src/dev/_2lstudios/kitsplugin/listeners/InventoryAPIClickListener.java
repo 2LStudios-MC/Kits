@@ -44,11 +44,9 @@ public class InventoryAPIClickListener implements Listener {
             if (item.isSimilar(inventoryUtil.getNextItem(page))) {
                 kitManager.openInventory(player, kitPlayer, page + 1);
                 event.setCancelled(true);
-                player.closeInventory();
             } else if (item.isSimilar(inventoryUtil.getBackItem(page))) {
                 kitManager.openInventory(player, kitPlayer, page - 1);
                 event.setCancelled(true);
-                player.closeInventory();
             } else if (item.isSimilar(inventoryUtil.getCloseItem())) {
                 event.setCancelled(true);
                 player.closeInventory();
