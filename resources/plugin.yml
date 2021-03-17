@@ -3,6 +3,7 @@ main: dev._2lstudios.kitsplugin.KitsPlugin
 version: 0.0.1
 author: 2LS
 depend: ["InventoryAPI"]
+soft-depend: ["Vault"]
 api-version: '1.13'
 commands:
   kit:

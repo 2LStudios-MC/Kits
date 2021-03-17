@@ -3,6 +3,7 @@ package dev._2lstudios.kitsplugin;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import dev._2lstudios.kitsplugin.commands.KitCMD;
@@ -14,9 +15,11 @@ import dev._2lstudios.kitsplugin.listeners.InventoryAPIClickListener;
 import dev._2lstudios.kitsplugin.listeners.PlayerJoinListener;
 import dev._2lstudios.kitsplugin.listeners.PlayerQuitListener;
 import dev._2lstudios.kitsplugin.utils.ConfigUtil;
+import net.milkbowl.vault.economy.Economy;
 
 public class KitsPlugin extends JavaPlugin {
     private static KitsPlugin instance;
+    private Economy economy = null;
     private KitManager kitManager = null;
     private KitPlayerManager kitPlayerManager = null;
 
@@ -28,6 +31,10 @@ public class KitsPlugin extends JavaPlugin {
         return instance;
     }
 
+	public Economy getEconomy() {
+		return economy;
+	}
+
     public KitManager getKitManager() {
         return kitManager;
     }
@@ -36,8 +43,23 @@ public class KitsPlugin extends JavaPlugin {
         return kitPlayerManager;
     }
 
+    private void setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return;
+        }
+
+        final RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+
+        if (rsp == null) {
+            return;
+        }
+
+        economy = rsp.getProvider();
+    }
+
     @Override
     public void onEnable() {
+        setupEconomy();
         setInstance(this);
 
         final Server server = getServer();

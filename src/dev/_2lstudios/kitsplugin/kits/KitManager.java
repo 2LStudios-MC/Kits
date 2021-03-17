@@ -21,7 +21,9 @@ import org.bukkit.plugin.Plugin;
 import dev._2lstudios.inventoryapi.InventoryAPI;
 import dev._2lstudios.inventoryapi.inventory.InventoryUtil;
 import dev._2lstudios.inventoryapi.inventory.InventoryWrapper;
+import dev._2lstudios.kitsplugin.KitsPlugin;
 import dev._2lstudios.kitsplugin.utils.ConfigUtil;
+import net.milkbowl.vault.economy.Economy;
 
 public class KitManager {
 	private final Plugin plugin;
@@ -50,35 +52,46 @@ public class KitManager {
 			final String kitName, final ItemStack itemStack) {
 		final ItemMeta itemMeta = itemStack.getItemMeta();
 		final List<String> lore = new ArrayList<>();
+		final int kitPrice = kit.getPrice();
 		final long cooldown = kitPlayer.getCooldown(kitName);
 		final ChatColor color;
 
 		lore.add("");
 
-		if (kit.getPrice() > 0) {
-			lore.add(ChatColor.GRAY + "Precio: " + ChatColor.GOLD + kit.getPrice());
+		if (kitPrice > 0) {
+			lore.add(ChatColor.GRAY + "Precio: " + ChatColor.GOLD + kitPrice);
 		}
 
 		if (!player.hasPermission("kit.kits." + kit.getName().toLowerCase())) {
+			final Economy economy = KitsPlugin.getInstance().getEconomy();
+
 			color = ChatColor.RED;
-			lore.add(ChatColor.GRAY + "Estado: " + ChatColor.RED + "BLOQUEADO");
+			lore.add(color + "BLOQUEADO");
 			lore.add("");
-			lore.add(ChatColor.translateAlternateColorCodes('&', "&cSin permisos!"));
+
+			if (kitPrice == 0) {
+				lore.add(color + "Permisos insuficientes!");
+			} else if (economy != null && economy.has(player, kitPrice)) {
+				lore.add(ChatColor.YELLOW + "Click para comprar!");
+			} else {
+				lore.add(color + "Dinero insuficiente!");
+			}
 		} else if (cooldown > 0) {
 			final int kitCooldown = kit.getCooldown();
 			final long lastTakeTime = kitPlayer.getCooldown(kit.getName());
-			final int milliseconds = (int) ((lastTakeTime + kitCooldown) - System.currentTimeMillis()),
-					seconds = (int) (milliseconds / 1000) % 60, minutes = (int) ((milliseconds / (1000 * 60)) % 60),
-					hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
+			final int milliseconds = (int) ((lastTakeTime + kitCooldown) - System.currentTimeMillis());
+			final int seconds = (milliseconds / 1000) % 60;
+			final int minutes = ((milliseconds / (1000 * 60)) % 60);
+			final int hours = ((milliseconds / (1000 * 60 * 60)) % 24);
 
 			color = ChatColor.RED;
-			lore.add(ChatColor.GRAY + "Estado: " + ChatColor.RED + "BLOQUEADO");
+			lore.add(color + "BLOQUEADO");
 			lore.add("");
 			lore.add(ChatColor.translateAlternateColorCodes('&',
 					"&cEspera &e" + hours + "H " + minutes + "M " + seconds + "S"));
 		} else {
 			color = ChatColor.GREEN;
-			lore.add(ChatColor.GRAY + "Estado: " + ChatColor.GREEN + "DESBLOQUEADO");
+			lore.add(color + "DESBLOQUEADO");
 			lore.add("");
 			lore.add(ChatColor.YELLOW + "Click para elegir!");
 		}
