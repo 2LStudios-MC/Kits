@@ -30,7 +30,7 @@ public class KitCMD implements CommandExecutor {
 				if (sender instanceof Player) {
 					final KitPlayer kitPlayer = kitPlayerManager.getPlayer((Player) sender);
 
-					kitManager.openInventory((Player) sender, kitPlayer);
+					//kitManager.openInventory((Player) sender, kitPlayer);
 
 					if (sender.hasPermission("kits.kit")) {
 						final String kitName = args[0].toUpperCase();
