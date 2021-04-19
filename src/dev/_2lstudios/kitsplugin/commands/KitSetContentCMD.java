@@ -17,7 +17,7 @@ public class KitSetContentCMD {
                 if (kit != null) {
                     final PlayerInventory inventory = ((Player) sender).getInventory();
 
-                    kit.setContents(inventory.getContents());
+                    kit.setContents(inventory);
 
                     sender.sendMessage(
                             ChatColor.translateAlternateColorCodes('&', "&aEstableciste el contenido correctamente!"));
