@@ -50,7 +50,7 @@
             <artifactId>InventoryAPI</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>/home/user/java/bin/InventoryAPI.jar</systemPath>
+            <systemPath>C:\Users\LinsaFTW\Documents\Jars\InventoryAPI.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
